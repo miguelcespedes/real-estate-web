@@ -290,6 +290,8 @@ const elements = {
   bedroomsSelect: document.getElementById("bedrooms-select"),
   locationSelect: document.getElementById("location-select"),
   sortSelect: document.getElementById("sort-select"),
+  advancedToggle: document.getElementById("filters-advanced-toggle"),
+  advancedPanel: document.getElementById("filters-advanced"),
   clearFiltersBtn: document.getElementById("clear-filters"),
   tagsContainer: document.getElementById("tags-container"),
   cardTemplate: document.getElementById("card-template"),
@@ -305,6 +307,47 @@ const elements = {
 };
 
 let lastFocusedElement = null;
+let isAdvancedVisible = false;
+
+function setAdvancedVisibility(visible) {
+  if (!elements.advancedToggle || !elements.advancedPanel) return;
+  isAdvancedVisible = Boolean(visible);
+  elements.advancedPanel.hidden = !isAdvancedVisible;
+  elements.advancedToggle.setAttribute("aria-expanded", String(isAdvancedVisible));
+  updateAdvancedToggleLabel();
+}
+
+function hasActiveAdvancedFilters() {
+  return (
+    state.filters.minPrice !== "" ||
+    state.filters.maxPrice !== "" ||
+    (Array.isArray(state.filters.tags) && state.filters.tags.length > 0)
+  );
+}
+
+function getActiveAdvancedFiltersCount() {
+  let count = 0;
+  if (state.filters.minPrice !== "") count += 1;
+  if (state.filters.maxPrice !== "") count += 1;
+  if (Array.isArray(state.filters.tags)) {
+    count += state.filters.tags.length;
+  }
+  return count;
+}
+
+function updateAdvancedToggleLabel() {
+  if (!elements.advancedToggle) return;
+  const hasActive = hasActiveAdvancedFilters();
+  const activeCount = getActiveAdvancedFiltersCount();
+  elements.advancedToggle.dataset.active = hasActive ? "true" : "false";
+  if (isAdvancedVisible) {
+    elements.advancedToggle.textContent = "Ocultar filtros";
+  } else if (hasActive) {
+    elements.advancedToggle.textContent = `Filtros activos (${activeCount})`;
+  } else {
+    elements.advancedToggle.textContent = "Más filtros";
+  }
+}
 
 function structuredClone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -435,7 +478,9 @@ function initializeFormOptions() {
     checkbox.name = "tags";
     checkbox.value = tag;
     label.appendChild(checkbox);
-    label.append(tag);
+    const text = document.createElement("span");
+    text.textContent = tag;
+    label.appendChild(text);
     tagFragment.appendChild(label);
   });
   elements.tagsContainer.appendChild(tagFragment);
@@ -658,6 +703,7 @@ function resetFilters() {
   saveFilters();
   updateQueryParams();
   applyStateToForm();
+  setAdvancedVisibility(false);
   debouncedRender.cancel();
   render();
 }
@@ -675,6 +721,7 @@ function handleFormChange(event) {
   state.sort = elements.sortSelect.value;
   state.visibleCount = ITEMS_PER_PAGE;
 
+  updateAdvancedToggleLabel();
   saveFilters();
   updateQueryParams();
   debouncedRender.cancel();
@@ -697,6 +744,22 @@ function handleLoadMore() {
 function initializeEventListeners() {
   elements.filtersForm.addEventListener("change", handleFormChange);
   elements.searchInput.addEventListener("input", handleSearchInput);
+  if (elements.advancedToggle && elements.advancedPanel) {
+    elements.advancedToggle.addEventListener("click", () => {
+      const nextVisible = elements.advancedPanel.hidden;
+      setAdvancedVisibility(nextVisible);
+      if (nextVisible) {
+        const focusable = elements.advancedPanel.querySelector(
+          'input:not([type="hidden"]), button, select, [tabindex]'
+        );
+        if (focusable) {
+          focusable.focus();
+        }
+      } else {
+        elements.advancedToggle.focus();
+      }
+    });
+  }
   elements.clearFiltersBtn.addEventListener("click", resetFilters);
   elements.emptyClear.addEventListener("click", resetFilters);
   elements.loadMore.addEventListener("click", handleLoadMore);
@@ -736,6 +799,7 @@ function initializeState() {
   state.visibleCount = ITEMS_PER_PAGE;
 
   applyStateToForm();
+  setAdvancedVisibility(hasActiveAdvancedFilters());
   saveFilters();
   updateQueryParams();
 }

@@ -8,83 +8,95 @@
   </head>
   <body>
     <header class="app-header">
-      <div class="app-header__content">
-        <h1 class="app-header__title">Encuentra tu próximo hogar</h1>
-        <p class="app-header__subtitle">
-          <span id="results-count">0</span> resultados disponibles
-        </p>
+      <div class="app-header__shell">
+        <div class="app-header__brand">
+          <a href="#" class="app-header__logo" aria-label="alquileres punto pe">
+            alquileres<span class="app-header__logo-mark">.pe</span>
+          </a>
+          <p class="app-header__tagline">Arrienda espacios selectos con total confianza.</p>
+        </div>
+        <div class="app-header__content">
+          <h1 class="app-header__title">Encuentra tu próximo hogar</h1>
+          <p class="app-header__subtitle">
+            <span id="results-count">0</span> resultados disponibles
+          </p>
+        </div>
       </div>
     </header>
 
     <main class="app-main">
       <section class="filters" aria-label="Filtros de búsqueda">
         <form id="filters-form" class="filters__form" autocomplete="off">
-          <div class="filters__group filters__group--search">
-            <label for="search-input">Buscar</label>
-            <input
-              type="search"
-              id="search-input"
-              name="q"
-              placeholder="Título o ubicación"
-              aria-describedby="search-help"
-            />
-            <small id="search-help">Filtra por título o ubicación.</small>
+          <div class="filters__toolbar">
+            <div class="filters__field filters__field--search">
+              <label class="visually-hidden" for="search-input">Buscar</label>
+              <input
+                type="search"
+                id="search-input"
+                name="q"
+                placeholder="Buscar por zona o título"
+                autocomplete="off"
+              />
+            </div>
+            <div class="filters__field">
+              <label class="visually-hidden" for="location-select">Ubicación</label>
+              <select id="location-select" name="location">
+                <option value="">Todas las ubicaciones</option>
+              </select>
+            </div>
+            <div class="filters__field">
+              <label class="visually-hidden" for="bedrooms-select">Dormitorios</label>
+              <select id="bedrooms-select" name="beds">
+                <option value="">Dormitorios</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4+</option>
+              </select>
+            </div>
+            <div class="filters__field">
+              <label class="visually-hidden" for="sort-select">Ordenar por</label>
+              <select id="sort-select" name="sort">
+                <option value="recent">Más recientes</option>
+                <option value="price-asc">Precio: menor a mayor</option>
+                <option value="price-desc">Precio: mayor a menor</option>
+                <option value="area-asc">m²: menor a mayor</option>
+                <option value="area-desc">m²: mayor a menor</option>
+              </select>
+            </div>
+            <div class="filters__field filters__field--more">
+              <button
+                type="button"
+                id="filters-advanced-toggle"
+                class="filters__more"
+                aria-expanded="false"
+                aria-controls="filters-advanced"
+              >
+                Más filtros
+              </button>
+            </div>
           </div>
 
-          <div class="filters__group filters__group--price">
-            <fieldset>
-              <legend>Rango de precio mensual</legend>
-              <div class="filters__inline">
-                <label for="min-price">Mínimo</label>
+          <div class="filters__advanced" id="filters-advanced" hidden>
+            <div class="filters__advanced-group filters__advanced-group--price">
+              <p class="filters__advanced-title">Precio mensual</p>
+              <div class="filters__range">
+                <label for="min-price">Mín.</label>
                 <input type="number" id="min-price" name="min" min="0" step="50" />
-              </div>
-              <div class="filters__inline">
-                <label for="max-price">Máximo</label>
+                <span aria-hidden="true">—</span>
+                <label for="max-price">Máx.</label>
                 <input type="number" id="max-price" name="max" min="0" step="50" />
               </div>
-            </fieldset>
-          </div>
-
-          <div class="filters__group">
-            <label for="bedrooms-select">Dormitorios</label>
-            <select id="bedrooms-select" name="beds">
-              <option value="">Todos</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4+</option>
-            </select>
-          </div>
-
-          <div class="filters__group">
-            <label for="location-select">Ubicación</label>
-            <select id="location-select" name="location">
-              <option value="">Todas</option>
-            </select>
-          </div>
-
-          <div class="filters__group filters__group--tags">
-            <fieldset>
-              <legend>Etiquetas</legend>
-              <div id="tags-container" class="filters__tags"></div>
-            </fieldset>
-          </div>
-
-          <div class="filters__group">
-            <label for="sort-select">Ordenar por</label>
-            <select id="sort-select" name="sort">
-              <option value="recent">Más recientes</option>
-              <option value="price-asc">Precio: menor a mayor</option>
-              <option value="price-desc">Precio: mayor a menor</option>
-              <option value="area-asc">m²: menor a mayor</option>
-              <option value="area-desc">m²: mayor a menor</option>
-            </select>
-          </div>
-
-          <div class="filters__actions">
-            <button type="button" id="clear-filters" class="button button--secondary">
-              Limpiar filtros
-            </button>
+            </div>
+            <div class="filters__advanced-group filters__advanced-group--tags">
+              <p class="filters__advanced-title">Etiquetas</p>
+              <div id="tags-container" class="filters__tags" role="group" aria-label="Etiquetas"></div>
+            </div>
+            <div class="filters__advanced-actions">
+              <button type="button" id="clear-filters" class="button button--ghost">
+                Limpiar filtros
+              </button>
+            </div>
           </div>
         </form>
       </section>
